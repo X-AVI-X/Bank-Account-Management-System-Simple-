@@ -1,6 +1,8 @@
-import java.io.IOException;
+import com.sun.xml.internal.bind.v2.model.core.ID;
+
+import javax.swing.*;
+import java.io.*;
 import java.util.Scanner;
-import java.io.FileWriter;
 
 public class Main {
 	static String name;
@@ -67,6 +69,18 @@ public class Main {
 		balance = scan.nextDouble();
 	}
 
+	public static int pinGenerator(){
+		int pin;
+		pin=IDGENERATOR.num()*year/980+month*314+day+623+IDGENERATOR.num()*year/day/month;
+		return pin;
+	}
+
+	public static int pinGenerator(int numTxt){
+		int pin;
+		pin=2*year/10+month*314+day+623+numTxt*year/month/day;
+		return pin;
+	}
+
 	public static void main(String[] args) {
 		int maxAccountNum = 10000;
 		DebitAccount d[] = new DebitAccount[maxAccountNum];
@@ -89,8 +103,13 @@ public class Main {
 								String ID = IDG.ID();
 								String fileName = ID + ".txt";
 								FileWriter debitFile = new FileWriter(fileName);
-								debitFile.write(d[num].printAccount());
+								debitFile.write(IDGENERATOR.num()-1+"\t"+name +"\t"+ year +"\t"+ month +"\t"+ day +"\t"+ nominee +"\t"+ balance
+								+"\t"+"Debit");
+								System.out.println("Your account number is: "+ID);
+								System.out.println("Your pin is: "+pinGenerator());
+								System.out.println("Remember this for future login to your account.");
 								debitFile.close();
+								System.out.println("Your debit account details has been written to your ID file permanently.");
 
 								try {
 									FileWriter myWriter = new FileWriter("num.txt");
@@ -119,9 +138,13 @@ public class Main {
 								String fileName = ID + ".txt";
 								FileWriter creditFile = new FileWriter(fileName);
 								//System.out.println("TEST BEFORE WRITING CREDIT DETAILS"+c[num].printAccount());
-								creditFile.write(c[num].printAccount());
+								creditFile.write(IDGENERATOR.num()-1+"\t"+name +"\t"+ year +"\t"+ month +"\t"+ day +"\t"+ nominee +"\t"+ balance
+										+"\t"+"Credit");
+								System.out.println("Your account number is: "+ID);
+								System.out.println("Your pin is: "+pinGenerator());
+								System.out.println("Remember this for future login to your account.");
 								creditFile.close();
-								System.out.println("Your credit account details written to yout ID file permanently.");
+								System.out.println("Your credit account details has been written to your ID file permanently.");
 
 								try {
 									FileWriter numForCredit = new FileWriter("num.txt");
@@ -147,11 +170,15 @@ public class Main {
 							try {
 								IDGENERATOR IDG = new IDGENERATOR(year, month);
 								String ID = IDG.ID();
-								System.out.println("Your ID is: " + ID);
 								String fileName = ID + ".txt";
 								FileWriter savingsFile = new FileWriter(fileName);
-								savingsFile.write(s[(int) num].printAccount());
+								savingsFile.write(IDGENERATOR.num()-1+"\t"+name +"\t"+ year +"\t"+ month +"\t"+ day +"\t"+ nominee +"\t"+ balance
+										+"\t"+"Savings");
+								System.out.println("Your account number is: "+ID);
+								System.out.println("Your pin is: "+pinGenerator());
+								System.out.println("Remember this for future login to your account.");
 								savingsFile.close();
+								System.out.println("Your savings account details has been written to your ID file permanently.");
 
 								try {
 									FileWriter numForSavings = new FileWriter("num.txt");
@@ -179,10 +206,48 @@ public class Main {
 					break;
 				}
 				case 2: {
-					System.out.print("Enter ID in plain numbers: ");
-					int inputID = scan.nextInt();
-					System.out.print("Enter password: ");
-					int inputPass = scan.nextInt();
+					System.out.print("Enter your account number: ");
+					String inputID = scan.nextLine()+".txt";
+					//System.out.println(inputID);
+					try {
+						int numTxt=0;
+						String accType=null;
+						BufferedReader br = new BufferedReader(new FileReader(inputID));
+							String line = null;
+							while ((line = br.readLine()) != null) {
+								String temp[] = line.split("\t");
+								numTxt= Integer.parseInt(temp[0]);
+								name = temp[1];
+								year = Integer.parseInt(temp[2]);
+								month = Integer.parseInt(temp[3]);
+								day = Integer.parseInt(temp[4]);
+								nominee = temp[5];
+								balance = Double.parseDouble(temp[6]);
+								accType=temp[7];
+							}
+							System.out.print("Enter pin: ");
+							int inputPin = scan.nextInt();
+							if (inputPin==pinGenerator(numTxt-1)){
+								System.out.println("Login successful");
+								if (accType=="Debit"){
+									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
+									d[num].printAccount();
+								}
+								if (accType=="Credit"){
+									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
+									d[num].printAccount();
+								}
+								if (accType=="Savings"){
+									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
+									d[num].printAccount();
+								}
+
+							}
+							else System.out.println("Login unsuccessful.");
+					}
+					catch (IOException e){
+						System.out.println("Your account number is wrong/doesn't exist.");
+					}
 					break;
 				}
 				case 3:

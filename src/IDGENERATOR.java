@@ -3,8 +3,8 @@ import java.util.Scanner;
 
 public class IDGENERATOR
 {
-    static String id;
-    public static int number = 1;
+    private String id;
+    public static int number;
     public IDGENERATOR(int year, int month) {
         try {
             char num='\0';
@@ -12,7 +12,7 @@ public class IDGENERATOR
             BufferedReader br=new BufferedReader(fr);           //Creation of BufferedReader object
             int c = 0;
             while((c = br.read()) != -1) {
-                num = (char) c;                                 //converting integer to char
+                num = (char) c;
             }
             number=(int) num;
             fr.close();
@@ -31,7 +31,11 @@ public class IDGENERATOR
             e.printStackTrace();
         }
     }
-    public static String ID()
+    public static int num()
+    {
+        return number;
+    }
+    public String ID()
     {
         return id;
     }
