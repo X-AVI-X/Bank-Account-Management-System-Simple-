@@ -1,6 +1,3 @@
-import com.sun.xml.internal.bind.v2.model.core.ID;
-
-import javax.swing.*;
 import java.io.*;
 import java.util.Scanner;
 
@@ -19,7 +16,7 @@ public class Main {
 		System.out.println("\nWelcome to Test Bank!");
 		System.out.println("\nChoose your type of action from below: ");
 		System.out.println("1. Create new account.");
-		System.out.println("2. Log in to your account.");
+		System.out.println("2. Log in to your account. [You can see your account info, deposit or withdraw your money from here.]");
 		System.out.println("3. Exit");
 		System.out.print("\nEnter option: ");
 		int choiceOfMain = scan.nextInt();
@@ -77,15 +74,15 @@ public class Main {
 
 	public static int pinGenerator(int numTxt){
 		int pin;
-		pin=2*year/10+month*314+day+623+numTxt*year/month/day;
+		pin=numTxt*year/980+month*314+day+623+numTxt*year/day/month;
 		return pin;
 	}
 
 	public static void main(String[] args) {
 		int maxAccountNum = 10000;
-		DebitAccount d[] = new DebitAccount[maxAccountNum];
-		Credit c[] = new Credit[maxAccountNum];
-		Savings s[] = new Savings[maxAccountNum];
+		DebitAccount[] d = new DebitAccount[maxAccountNum];
+		Credit[] c = new Credit[maxAccountNum];
+		Savings[] s = new Savings[maxAccountNum];
 		Scanner scan = new Scanner(System.in);
 		boolean i = true;
 		while (i) {
@@ -99,10 +96,22 @@ public class Main {
 							d[num] = new DebitAccount(name, day, month, year, nominee, balance);
 							System.out.println("\nYour debit account is created successfully!");
 							try {
+								///////////////////////////////////////////////////////////////////////////////////////////////
 								IDGENERATOR IDG = new IDGENERATOR(year, month);
 								String ID = IDG.ID();
-								String fileName = ID + ".txt";
-								FileWriter debitFile = new FileWriter(fileName);
+								String fileName= ID + ".txt";
+								String path="D:\\Study\\JavaCodes\\Account\\";
+								path = path + ID;
+								//Creating a File object
+								File file = new File(path);
+								//Creating the directory
+								boolean bool = file.mkdir();
+								if(bool){
+									System.out.println("Directory created successfully");
+								}else {
+									System.out.println("Sorry couldn’t create specified directory");
+								}////////////////////////////////////////////////////////////////////////////////////////////
+								FileWriter debitFile = new FileWriter(path+File.separator+fileName);
 								debitFile.write(IDGENERATOR.num()-1+"\t"+name +"\t"+ year +"\t"+ month +"\t"+ day +"\t"+ nominee +"\t"+ balance
 								+"\t"+"Debit");
 								System.out.println("Your account number is: "+ID);
@@ -207,15 +216,16 @@ public class Main {
 				}
 				case 2: {
 					System.out.print("Enter your account number: ");
-					String inputID = scan.nextLine()+".txt";
+					String inputID = scan.next();
+					String idFile = inputID+".txt";
 					//System.out.println(inputID);
 					try {
 						int numTxt=0;
 						String accType=null;
-						BufferedReader br = new BufferedReader(new FileReader(inputID));
-							String line = null;
+						BufferedReader br = new BufferedReader(new FileReader(idFile));
+							String line;
 							while ((line = br.readLine()) != null) {
-								String temp[] = line.split("\t");
+								String[] temp = line.split("\t");
 								numTxt= Integer.parseInt(temp[0]);
 								name = temp[1];
 								year = Integer.parseInt(temp[2]);
@@ -227,21 +237,80 @@ public class Main {
 							}
 							System.out.print("Enter pin: ");
 							int inputPin = scan.nextInt();
-							if (inputPin==pinGenerator(numTxt-1)){
-								System.out.println("Login successful");
-								if (accType=="Debit"){
-									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
-									d[num].printAccount();
+						//System.out.println(pinGenerator(numTxt+1));
+							if (inputPin==pinGenerator(numTxt+1)){
+								System.out.println();
+								System.out.println("***********************");
+								System.out.println("** Login successful! **");
+								System.out.println("***********************");
+								assert accType != null;
+								switch (accType) {
+									case "Debit": {
+										d[num] = new DebitAccount(name, day, month, year, nominee, balance);
+										System.out.println(d[num].loggedPrintAccount(inputID));
+										switch (afterLoginAction()) {
+											case 1: {
+												d[num].deposit();
+												break;
+											}
+											case 2: {
+												d[num].withdraw();
+											}
+											case 3: {
+												break;
+											}
+											case 4: {
+												i = false;
+											}
+										}
+									}
+										break;
+									case "Credit": {
+										c[num] = new Credit(name, day, month, year, nominee, balance);
+										System.out.println(c[num].loggedPrintAccount(inputID));
+										switch (afterLoginAction()) {
+											case 1: {
+												c[num].deposit();
+												break;
+											}
+											case 2: {
+												c[num].withdraw();
+												break;
+											}
+											case 3: {
+												break;
+											}
+											case 4: {
+												i = false;
+											}
+										}
+									}
+										break;
+									case "Savings": {
+										s[num] = new Savings(name, day, month, year, nominee, balance);
+										System.out.println(s[num].loggedPrintAccount(inputID));
+										switch (afterLoginAction()) {
+											case 1: {
+												s[num].deposit();
+												break;
+											}
+											case 2: {
+												s[num].withdraw();
+												break;
+											}
+											case 3: {
+												break;
+											}
+											case 4: {
+												i = false;
+											}
+										}
+									}
+										break;
+									default:
+										System.out.println("Data not found.");
+										break;
 								}
-								if (accType=="Credit"){
-									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
-									d[num].printAccount();
-								}
-								if (accType=="Savings"){
-									d[num] = new DebitAccount(name, day, month, year, nominee, balance);
-									d[num].printAccount();
-								}
-
 							}
 							else System.out.println("Login unsuccessful.");
 					}
@@ -252,7 +321,33 @@ public class Main {
 				}
 				case 3:
 					i = false;
+					break;
+				default:
+					System.out.println("Invalid choice. Enter again.");
+					break;
 			}
 		}
+	}
+
+	private static void debitFileUpdater (String idFile){
+		try {
+			FileWriter debitFile = new FileWriter(idFile);
+			debitFile.write(IDGENERATOR.num() - 1 + "\t" + name + "\t" + year + "\t" + month + "\t" + day + "\t" + nominee + "\t" + balance
+					+ "\t" + "Debit");
+		} catch (IOException e){
+			System.out.println("Error writing updated details.");
+		}
+	}
+
+	private static int afterLoginAction(){
+		Scanner scan = new Scanner(System.in);
+		System.out.println("\nWhat do you want to do now?");
+		System.out.println("1. Deposit money.");
+		System.out.println("2. Withdraw money.");
+		System.out.println("3. Go back to main menu.");
+		System.out.println("4. Exit.");
+		System.out.print("\nEnter choice: ");
+		int choiceOfAfterLogin = scan.nextInt();
+		return choiceOfAfterLogin;
 	}
 }
