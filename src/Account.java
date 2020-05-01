@@ -4,7 +4,7 @@ public class Account
 	protected static Date DOB;
 	protected String name;
 	protected String nominee;
-	protected double balance ;
+	protected static double balance ;
 
 	public Account()
 	{

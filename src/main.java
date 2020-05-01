@@ -8,7 +8,6 @@ public class main {
 	static int year;
 	static String nominee;
 	static double balance;
-	static double amount;
 	static int num = 0;
 
 	private static int mainMenu() {
@@ -24,7 +23,7 @@ public class main {
 			return choiceOfMain;
 		}
 		catch (Exception e){
-			return 4;						//It will execute the default command of switch 
+			return 4;						//It will execute the default command of switch(mainMenu)
 		}
 	}
 
@@ -43,7 +42,7 @@ public class main {
 			return choiceOfCreateAcc;
 		}
 		catch (Exception e){
-			return 6;						//It will execute the default command of switch
+			return 6;						//It will execute the default command of switch(createAcc)
 		}
 	}
 
@@ -306,7 +305,9 @@ public class main {
 											break;
 										}
 										case 4: {
+											System.out.println("Closing application...");
 											i = false;
+											break;
 										}
 										default:
 											System.out.println("Invalid choice.");
@@ -331,7 +332,9 @@ public class main {
 											break;
 										}
 										case 4: {
+											System.out.println("Closing application...");
 											i = false;
+											break;
 										}
 										default: System.out.println("Invalid option. Write valid option (eg: 2).");
 										break;
@@ -356,7 +359,9 @@ public class main {
 											break;
 										}
 										case 4: {
+											System.out.println("Closing application...");
 											i = false;
+											break;
 										}
 										default: System.out.println("Invalid option. Write valid option (eg: 2).");
 										break;
